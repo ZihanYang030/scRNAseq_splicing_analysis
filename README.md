@@ -12,7 +12,7 @@ What it does:
 
 note: exact target coordinates and working data / file paths are intentionally **de-identified**
 
-All scripts here use one single project root. In our original working directories, some files were stored in a personal working directory and the large raw data were stored in shared storage. For this cleaned manual, both are denoted by `PROJECT_DIRECTORY`. If your installation separates working scripts from shared raw-data storage, define `PROJECT_DIRECTORY` as needed
+All scripts here use one single project root, `PROJECT_DIRECTORY`. Replace it as needed
 
 ## Requirements
 
@@ -27,9 +27,9 @@ Optional web scraper needs: `pandas`, `playwright`, and a Playwright browser ins
 
 ## Inputs
 
-If data is stored separately from the scripts, set `PROJECT_DIRECTORY` to a local data directory outside the repository. Only one accession should be placed in each line in `SRR_Acc_List.txt`; create `L23ITCTX_Acc_List.txt` and `Oligo_Acc_List.txt` from the public metadata 
+If data is stored separately from the scripts, set `PROJECT_DIRECTORY` to a local data directory outside the repository. Only one accession should be placed in each line in `SRR_Acc_List.txt`. 
 
-The target-specific scripts read `TARGET_REGIONS_FILE`, a tab-separated file with columns `region`, `chrom`, `start`, `end`, and `strand`. See [`config/target_regions.example.tsv`](config/target_regions.example.tsv) for the required region names. Replace every placeholder with your own annotation values (please use one-based inclusive coordinates) and store the filled file outside this repository. `gene_span` defines the junction-search interval; `bam_window` defines the region retained from a temporary full BAM. Make sure to keep genome build and chromosome names consistent across the annotation, STAR index, and BAM files.
+The target-specific scripts read `TARGET_REGIONS_FILE`, see [`config/target_regions.example.tsv`](config/target_regions.example.tsv) for the required column names. Replace every placeholder with your own annotation values (please use one-based inclusive coordinates) and store the filled file outside this repository. Make sure to keep genome build and chromosome names consistent across the annotation, STAR index, and BAM files.
 
 ```bash
 export PROJECT_DIRECTORY=/path/to/local_analysis_data
