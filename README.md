@@ -22,13 +22,14 @@ All scripts here use one single project root. In our original working directorie
 - `samtools`, Python 3, and R for the targeted analysis
 - Optional: `pigz` for faster compression; AWS CLI (not used in this project) or Python `pandas` and `playwright` for submitted-file-name lookup
 
-Main analysis pipeline: SRA Toolkit 3.2.0, Trimmomatic 0.39, and STAR 2.7.11b. Optional web scraper needs: `pandas`, `playwright`, and a Playwright browser installation
+Main analysis pipeline: SRA Toolkit 3.2.0, Trimmomatic 0.39, and STAR 2.7.11b. \
+Optional web scraper needs: `pandas`, `playwright`, and a Playwright browser installation
 
 ## Inputs
 
 If data is stored separately from the scripts, set `PROJECT_DIRECTORY` to a local data directory outside the repository. Only one accession should be placed in each line in `SRR_Acc_List.txt`; create `L23ITCTX_Acc_List.txt` and `Oligo_Acc_List.txt` from the public metadata 
 
-The target-specific scripts read `TARGET_REGIONS_FILE`, a tab-separated file with columns `region`, `chrom`, `start`, `end`, and `strand`. See [`config/target_regions.example.tsv`](config/target_regions.example.tsv) for the required region names. Replace every placeholder with your own annotation values (please use one-based inclusive coordinates) and store the filled file outside this repository. `gene_span` defines the junction-search interval; `bam_window` defines the region retained from a temporary full BAM. The file also defines exons 1–5, 6a, 6b, 7–11, the complete terminal exon-6 region, and the short 3′ UTR region. Make sure to keep genome build and chromosome names consistent across the annotation, STAR index, and BAM files.
+The target-specific scripts read `TARGET_REGIONS_FILE`, a tab-separated file with columns `region`, `chrom`, `start`, `end`, and `strand`. See [`config/target_regions.example.tsv`](config/target_regions.example.tsv) for the required region names. Replace every placeholder with your own annotation values (please use one-based inclusive coordinates) and store the filled file outside this repository. `gene_span` defines the junction-search interval; `bam_window` defines the region retained from a temporary full BAM. Make sure to keep genome build and chromosome names consistent across the annotation, STAR index, and BAM files.
 
 ```bash
 export PROJECT_DIRECTORY=/path/to/local_analysis_data
