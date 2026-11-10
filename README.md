@@ -37,8 +37,8 @@ export TARGET_REGIONS_FILE=/path/to/target_regions.tsv
 python3 scripts/regions.py validate
 ```
 
-The commands below assume they are run from the repository root. 
-Please make sure to check available storage before downloading or aligning a large dataset.
+The commands below assume they are run from the repository root. \
+**Please make sure to check available storage before downloading or aligning a large dataset.**
 
 ## Workflow
 
