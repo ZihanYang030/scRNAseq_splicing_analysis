@@ -43,11 +43,17 @@ Please make sure to check available storage before downloading or aligning a lar
 ## Workflow
 
 1. **Prepare accession lists** Download the public GSE185862 metadata (which is large, check your storage before download), confirm the run-to-cell mapping, and write the three accession lists described above. Each SRR run is treated as a cell in this analysis (this might be different for different datasets). Please review the source metadata before reusing this assumption.
+
 2. **Download and convert reads** Run `bash scripts/prefetch_missing_sra.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`, then `bash scripts/prefetch_fasterq_generic.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`. Use `scripts/check_missing_sra.sh` and `scripts/list_missing_fastq.sh` to find incomplete inputs. The converter accepts single-end or paired-end SRA output and compresses the FASTQ files
+
 3. **Prepare each population and align** Use `scripts/link_fastq_by_run.sh` to create run-specific FASTQ links. Build a compatible STAR index in `$PROJECT_DIRECTORY/star_index` using the reference genome selected for your analysis. Then set `RUN_NAME` and `LIST` and run `scripts/run_trim_star.sh` for each population. The trimming settings for this project are `HEADCROP:10 TRAILING:15 AVGQUAL:20 MINLEN:30`. STAR produces `SJ.out.tab` and `Log.final.out` here; the targeted BAM will be produced later. `scripts/summarize_star_mapping.sh` summarizes the mapping quality
+
 4. **Define target exons and collect junctions** Run `python3 scripts/write_manual_Pakap_exons_current.py` to create annotation tables from the coordinates. Run `python3 scripts/find_Pakap_junctions_current.py` to collect unique-read junction evidence from STAR output.
+
 5. **Calculate EIP and targeted junction measures** Run `Rscript scripts/calc_Pakap_manual_EIP_current.R`. calculates ordinary internal-exon EIP and exon-6 junction measures for each cell and population (as exon-6 appears as the terminal exon, we then switched to classifying evidences for entry, internal continuation, and skipping)
+
 6. **Measure terminal-region coverage** Run `bash scripts/combine_accession_lists.sh`, `bash scripts/run_star_region_bam_L23ITCTX_Oligo_all.sh`, and `bash scripts/count_Pakap_exon6_region_coverage_all.sh`. The BAM script temporarily creates a full sorted BAM, retains the configured `bam_window`, and removes the temporary full BAM. This stage expects paired-end trimmed reads.
+
 7. **Classify evidence and chekc for overlap** Run `Rscript scripts/calc_Pakap_terminal_exon6_evidence_all_cells.R` and `Rscript scripts/check_category_overlap.R`. Then check `$PROJECT_DIRECTORY/results` for results.
 
 Example commands for the two population-specific alignment runs:
