@@ -20,20 +20,22 @@ All scripts here use one single project root, `PROJECT_DIRECTORY`. Replace it as
 - [Trimmomatic](https://github.com/usadellab/Trimmomatic)
 - [STAR](https://github.com/alexdobin/STAR) and a compatible mouse reference-genome index
 - `samtools`, Python 3, and R for the targeted analysis
-- Optional: `pigz` for faster compression; AWS CLI (not used in this project) or Python `pandas` and `playwright` for submitted-file-name lookup
+- Optional: `pigz` for faster compression; AWS CLI (not available for this dataset, provided for reference)
 
 Main analysis pipeline: SRA Toolkit 3.2.0, Trimmomatic 0.39, and STAR 2.7.11b. \
 Optional web scraper needs: `pandas`, `playwright`, and a Playwright browser installation
 
 ## Inputs
 
-If data is stored separately from the scripts, set `PROJECT_DIRECTORY` to a local data directory outside the repository. Only one accession should be placed in each line in `SRR_Acc_List.txt`. 
+If data is stored separately from the scripts, set `PROJECT_DIRECTORY` to a local data directory outside the repository. Also, only one accession should be placed in each line in `SRR_Acc_List.txt`. 
 
-The target-specific scripts read `TARGET_REGIONS_FILE`, see [`config/target_regions.example.tsv`](config/target_regions.example.tsv) for the required column names. Replace every placeholder with your own annotation values (please use one-based inclusive coordinates) and store the filled file outside this repository. Make sure to keep genome build and chromosome names consistent across the annotation, STAR index, and BAM files.
+The target-specific scripts read `TARGET_REGIONS_FILE`, see [`config/target_regions.example.tsv`](config/target_regions.example.tsv) for example. Replace the placeholders with your own annotation values (please use one-based inclusive coordinates) and store the filled file outside this repository. Make sure to keep genome build and chromosome names consistent across the annotation, STAR index, and BAM files.
 
 ```bash
 export PROJECT_DIRECTORY=/path/to/local_analysis_data
+
 export TARGET_REGIONS_FILE=/path/to/target_regions.tsv
+
 python3 scripts/regions.py validate
 ```
 
@@ -42,13 +44,23 @@ The commands below assume they are run from the repository root. \
 
 ## Workflow
 
-1. **Prepare accession lists** Download the public GSE185862 metadata (which is large, check your storage before download), confirm the run-to-cell mapping, and write the three accession lists described above. Each SRR run is treated as a cell in this analysis (this might be different for different datasets). Please review the source metadata before reusing this assumption.
+1. **Prepare accession lists**
+   Download the public GSE185862 metadata (which is large, check your storage before download), confirm the run-to-cell mapping, and write the three accession lists. \
+   Each SRR run is treated as a cell in this analysis (this might be different for different datasets). Please review the source metadata before reusing this assumption.
 
-2. **Download and convert reads** Run `bash scripts/prefetch_missing_sra.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`, then `bash scripts/prefetch_fasterq_generic.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`. Use `scripts/check_missing_sra.sh` and `scripts/list_missing_fastq.sh` to find incomplete inputs. The converter accepts single-end or paired-end SRA output and compresses the FASTQ files
+2. **Download and convert reads**
+   Run `bash scripts/prefetch_missing_sra.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`, then `bash scripts/prefetch_fasterq_generic.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`.
+   Use `scripts/check_missing_sra.sh` and `scripts/list_missing_fastq.sh` to find incomplete inputs.
 
-3. **Prepare each population and align** Use `scripts/link_fastq_by_run.sh` to create run-specific FASTQ links. Build a compatible STAR index in `$PROJECT_DIRECTORY/star_index` using the reference genome selected for your analysis. Then set `RUN_NAME` and `LIST` and run `scripts/run_trim_star.sh` for each population. The trimming settings for this project are `HEADCROP:10 TRAILING:15 AVGQUAL:20 MINLEN:30`. STAR produces `SJ.out.tab` and `Log.final.out` here; the targeted BAM will be produced later. `scripts/summarize_star_mapping.sh` summarizes the mapping quality
+3. **Prepare each population and align**
+   Use `scripts/link_fastq_by_run.sh` to create run-specific FASTQ links (optional).
+   Build a compatible STAR index in `$PROJECT_DIRECTORY/star_index` using the reference genome.
+   Then set `RUN_NAME` and `LIST` and run `scripts/run_trim_star.sh` for each population.
+   The trimming settings used for this project: `HEADCROP:10 TRAILING:15 AVGQUAL:20 MINLEN:30`.
+   Use `scripts/summarize_star_mapping.sh` summarizes the mapping quality
 
-4. **Define target exons and collect junctions** Run `python3 scripts/write_manual_Pakap_exons_current.py` to create annotation tables from the coordinates. Run `python3 scripts/find_Pakap_junctions_current.py` to collect unique-read junction evidence from STAR output.
+4. **Define target exons and collect junctions**
+   Run `python3 scripts/write_manual_Pakap_exons_current.py` to create annotation tables from the coordinates. Run `python3 scripts/find_Pakap_junctions_current.py` to collect unique-read junction evidence from STAR output.
 
 5. **Calculate EIP and targeted junction measures** Run `Rscript scripts/calc_Pakap_manual_EIP_current.R`. calculates ordinary internal-exon EIP and exon-6 junction measures for each cell and population (as exon-6 appears as the terminal exon, we then switched to classifying evidences for entry, internal continuation, and skipping)
 
