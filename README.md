@@ -33,9 +33,7 @@ The target-specific scripts read `TARGET_REGIONS_FILE`, see [`config/target_regi
 
 ```bash
 export PROJECT_DIRECTORY=/path/to/local_analysis_data
-
 export TARGET_REGIONS_FILE=/path/to/target_regions.tsv
-
 python3 scripts/regions.py validate
 ```
 
@@ -44,29 +42,30 @@ The commands below assume they are run from the repository root. \
 
 ## Workflow
 
-1. **Prepare accession lists**
+1. **Prepare accession lists** \
    Download the public GSE185862 metadata (which is large, check your storage before download), confirm the run-to-cell mapping, and write the three accession lists. \
-   Each SRR run is treated as a cell in this analysis (this might be different for different datasets). Please review the source metadata before reusing this assumption.
+   Each SRR run is treated as a cell in this analysis (this might be different for different datasets). Please review the source metadata before reusing this assumption. \
 
-2. **Download and convert reads**
-   Run `bash scripts/prefetch_missing_sra.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`, then `bash scripts/prefetch_fasterq_generic.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`.
-   Use `scripts/check_missing_sra.sh` and `scripts/list_missing_fastq.sh` to find incomplete inputs.
+2. **Download and convert reads** \
+   Run `bash scripts/prefetch_missing_sra.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`, then `bash scripts/prefetch_fasterq_generic.sh "$PROJECT_DIRECTORY/SRR_Acc_List.txt"`. \
+   Use `scripts/check_missing_sra.sh` and `scripts/list_missing_fastq.sh` to find incomplete inputs. \
 
-3. **Prepare each population and align**
-   Use `scripts/link_fastq_by_run.sh` to create run-specific FASTQ links (optional).
-   Build a compatible STAR index in `$PROJECT_DIRECTORY/star_index` using the reference genome.
-   Then set `RUN_NAME` and `LIST` and run `scripts/run_trim_star.sh` for each population.
-   The trimming settings used for this project: `HEADCROP:10 TRAILING:15 AVGQUAL:20 MINLEN:30`.
-   Use `scripts/summarize_star_mapping.sh` summarizes the mapping quality
+3. **Prepare each population and align** \
+   Use `scripts/link_fastq_by_run.sh` to create run-specific FASTQ links (optional). \
+   Build a compatible STAR index in `$PROJECT_DIRECTORY/star_index` using the reference genome. \
+   Then set `RUN_NAME` and `LIST` and run `scripts/run_trim_star.sh` for each population. \
+   The trimming settings used for this project: `HEADCROP:10 TRAILING:15 AVGQUAL:20 MINLEN:30`. \
+   Use `scripts/summarize_star_mapping.sh` summarizes the mapping quality \
 
-4. **Define target exons and collect junctions**
-   Run `python3 scripts/write_manual_Pakap_exons_current.py` to create annotation tables from the coordinates. Run `python3 scripts/find_Pakap_junctions_current.py` to collect unique-read junction evidence from STAR output.
+4. **Define target exons and collect junctions** \
+   Run `python3 scripts/write_manual_Pakap_exons_current.py` to create annotation tables from the coordinates. \
+   Run `python3 scripts/find_Pakap_junctions_current.py` to collect unique-read junction evidence from STAR output. \
 
 5. **Calculate EIP and targeted junction measures** Run `Rscript scripts/calc_Pakap_manual_EIP_current.R`. calculates ordinary internal-exon EIP and exon-6 junction measures for each cell and population (as exon-6 appears as the terminal exon, we then switched to classifying evidences for entry, internal continuation, and skipping)
 
-6. **Measure terminal-region coverage** Run `bash scripts/combine_accession_lists.sh`, `bash scripts/run_star_region_bam_L23ITCTX_Oligo_all.sh`, and `bash scripts/count_Pakap_exon6_region_coverage_all.sh`. The BAM script temporarily creates a full sorted BAM, retains the configured `bam_window`, and removes the temporary full BAM. This stage expects paired-end trimmed reads.
+8. **Measure terminal-region coverage** Run `bash scripts/combine_accession_lists.sh`, `bash scripts/run_star_region_bam_L23ITCTX_Oligo_all.sh`, and `bash scripts/count_Pakap_exon6_region_coverage_all.sh`. The BAM script temporarily creates a full sorted BAM, retains the configured `bam_window`, and removes the temporary full BAM. This stage expects paired-end trimmed reads.
 
-7. **Classify evidence and chekc for overlap** Run `Rscript scripts/calc_Pakap_terminal_exon6_evidence_all_cells.R` and `Rscript scripts/check_category_overlap.R`. Then check `$PROJECT_DIRECTORY/results` for results.
+9. **Classify evidence and chekc for overlap** Run `Rscript scripts/calc_Pakap_terminal_exon6_evidence_all_cells.R` and `Rscript scripts/check_category_overlap.R`. Then check `$PROJECT_DIRECTORY/results` for results.
 
 Example commands for the two population-specific alignment runs:
 
