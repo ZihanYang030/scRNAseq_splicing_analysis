@@ -89,7 +89,8 @@ For an internal exon, exon inclusion proportion (EIP) uses junction reads that s
 
 $$EIP = \frac{I}{I + 2E}$$
 
-For Pakap exon 6, `E5 → E6a` supports entry from exon 5 to exon 6 part a, `E6a → E7` supports internal continuation from exon 6 to exon 7, and `E5 → E7` supports skipping exon 6. \
+For Pakap exon 6, `E5 → E6a` supports entry from exon 5 to exon 6 part a, `E6a → E7` supports internal continuation from exon 6 to exon 7, and `E5 → E7` supports skipping exon 6. 
+
 **As entry alone cannot establish transcript termination,** we then used the targeted analysis to combine junction evidence with read overlap in exon 6b and the 3′ UTR. We define strong, moderate, or weak terminal candidates, internal-continuation evidence, and skip evidence at **cell level** (a cell can support more than one category through different reads).
 
 ## Scripts
