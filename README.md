@@ -8,7 +8,7 @@ What it does:
 - creates FASTQ files
 - trims reads
 - aligns with STAR
-- performs splicing analysis for Pakap gene and terminal exon-6 evidence in L2/3 IT CTX cells and oligodendrocytes
+- performs splicing analysis for [*Pakap*](https://www.informatics.jax.org/marker/MGI:5141924) gene and terminal exon-6 evidence in L2/3 IT CTX cells and oligodendrocytes
 
 note: exact target coordinates and working data / file paths are intentionally **de-identified**
 
@@ -89,7 +89,7 @@ For an internal exon, exon inclusion proportion (EIP) uses junction reads that s
 
 $$EIP = \frac{I}{I + 2E}$$
 
-For Pakap exon 6, `E5 → E6a` supports entry from exon 5 to exon 6 part a, `E6a → E7` supports internal continuation from exon 6 to exon 7, and `E5 → E7` supports skipping exon 6. 
+For *Pakap* exon 6, `E5 → E6a` supports entry from exon 5 to exon 6 part a, `E6a → E7` supports internal continuation from exon 6 to exon 7, and `E5 → E7` supports skipping exon 6. 
 
 **As entry alone cannot establish transcript termination,** we then used the targeted analysis to combine junction evidence with read overlap in exon 6b and the 3′ UTR. We define strong, moderate, or weak terminal candidates, internal-continuation evidence, and skip evidence at **cell level** (a cell can support more than one category through different reads).
 
@@ -111,6 +111,7 @@ Suggestions and feedbacks are greatly appreciated! Please contact: [zy56@rice.ed
 ## References
 
 - [GSE185862, NCBI GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE185862): source sequencing dataset and metadata
+- [*Pakap* Gene, Mouse Genome Informatics](https://www.informatics.jax.org/marker/MGI:5141924): gene of interest
 - [King et al., *Journal of Neuroscience* (2026)](https://www.jneurosci.org/content/46/16/e0019262026): alternative-splicing analysis approach
 - [STAR](https://github.com/alexdobin/STAR), [Trimmomatic](https://github.com/usadellab/Trimmomatic), and [SRA Toolkit](https://github.com/ncbi/sra-tools): softwares used
 
